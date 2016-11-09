@@ -1,9 +1,9 @@
 /*
     Convert CSV to JSON:
-       csv2json foo.csv out.json
+       csv2json out.csv > out.json
        Edit the JSON_PATH in this file to point to your json file.
        Run this with:
-           node index.js > output.geojson
+           node index.js > out.geojson
 */
 
 var request = require('request');
@@ -12,7 +12,7 @@ var queue = require('d3-queue').queue;
 var fs = require('fs');
 var turfCentroid = require('turf-centroid');
 
-var JSON_PATH = './csvs/bali.json';
+var JSON_PATH = './out.json';
 var API_BASE = 'https://jzvqzn73ca.execute-api.us-east-1.amazonaws.com/api/feature/';
 
 var data = require(JSON_PATH);
@@ -59,8 +59,16 @@ function fetchLocation(row, callback) {
         var lat, lon;
         var geojson = JSON.parse(response.body);
         if (osm.type === 'node') {
+          try{
             lon = geojson.geometry.coordinates[0];
             lat = geojson.geometry.coordinates[1];
+          } catch (e){
+            lon = 0;
+            lat = 0;
+            console.error('ERROR', geojson);
+            console.error('ERROR', JSON.stringify(row, null, 2));
+            return callback(null, row);
+          }
         } else if (osm.type === 'way') {
             var fc = {
                 'type': 'FeatureCollection',
@@ -68,13 +76,15 @@ function fetchLocation(row, callback) {
             };
             try {
                 var centroid = turfCentroid(fc);
+                lon = centroid.geometry.coordinates[0];
+                lat = centroid.geometry.coordinates[1];
             } catch (e) {
+                lon = 0;
+                lat = 0;
                 console.error('ERROR', geojson);
                 console.error('ERROR', JSON.stringify(row, null, 2));
                 return callback(null, row);
             }
-            lon = centroid.geometry.coordinates[0];
-            lat = centroid.geometry.coordinates[1];
         }
         row.lon = lon;
         row.lat = lat;
