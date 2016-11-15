@@ -44,15 +44,11 @@ q.awaitAll(function(err, results) {
 });
 
 function fetchLocation(row, callback) {
-    if (!row.node_osm_id && !row.way_osm_id) return callback(null, row);
-    var osm = {};
-    if (row.node_osm_id) {
-        osm.id = row.node_osm_id;
-        osm.type = 'node';
-    } else if (row.way_osm_id) {
-        osm.id = row.way_osm_id;
-        osm.type = 'way';
-    }
+    if (!row.osm_id || !row.osm_type) return callback(null, row);
+    var osm = {
+        'type': row.osm_type,
+        'id': row.osm_id
+    };
     var url = API_BASE + osm.type + '/' + osm.id;
     request(url, function(err, response) {
         if (err) throw err;
