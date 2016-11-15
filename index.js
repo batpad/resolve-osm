@@ -12,7 +12,7 @@ var queue = require('d3-queue').queue;
 var fs = require('fs');
 var turfCentroid = require('turf-centroid');
 
-var JSON_PATH = './csvs/bali.json';
+var JSON_PATH = './example.json';
 var API_BASE = 'https://jzvqzn73ca.execute-api.us-east-1.amazonaws.com/api/feature/';
 
 var data = require(JSON_PATH);
@@ -54,10 +54,14 @@ function fetchLocation(row, callback) {
         if (err) throw err;
         var lat, lon;
         var geojson = JSON.parse(response.body);
+        if (!geojson.properties || !geojson.geometry) {
+            return callback(null, row);
+            console.error('ERROR', row);
+        }
         if (osm.type === 'node') {
             lon = geojson.geometry.coordinates[0];
             lat = geojson.geometry.coordinates[1];
-        } else if (osm.type === 'way') {
+        } else if (osm.type === 'way' || osm.type === 'relation') {
             var fc = {
                 'type': 'FeatureCollection',
                 'features': [geojson]
