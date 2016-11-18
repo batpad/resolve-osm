@@ -10,12 +10,14 @@ var request = require('request');
 var csv2json = require('csv2json');
 var queue = require('d3-queue').queue;
 var fs = require('fs');
+var path = require('path');
 var turfCentroid = require('turf-centroid');
-
-var JSON_PATH = './example.json';
+var argv = require('minimist')(process.argv.slice(2));
+var JSON_PATH = argv._[0];
+var outFile = argv._[1];
 var API_BASE = 'https://jzvqzn73ca.execute-api.us-east-1.amazonaws.com/api/feature/';
 
-var data = require(JSON_PATH);
+var data = require(path.join(__dirname, JSON_PATH));
 
 var q = queue(3);
 data.forEach(function(d) {
@@ -37,10 +39,11 @@ q.awaitAll(function(err, results) {
             features.push(feature);
         }
     });
-    console.log(JSON.stringify({
+    var geojson = JSON.stringify({
         'type': 'FeatureCollection',
         'features': features
-    }, null, 2));
+    }, null, 2);
+    fs.writeFileSync(path.join(__dirname, outFile), geojson);
 });
 
 function fetchLocation(row, callback) {

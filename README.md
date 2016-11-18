@@ -10,4 +10,4 @@ Edit the [path to your json file](https://github.com/batpad/resolve-osm/blob/mas
 
 Run the script
 
-` node index.js > output.geojson`
+`node index.js <input_file.csv> <output.geojson>`
