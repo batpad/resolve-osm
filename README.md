@@ -6,8 +6,6 @@ Convert your CSV to a JSON
 
 `csv2json foo.csv out.json`
 
-Edit the [path to your json file](https://github.com/batpad/resolve-osm/blob/master/index.js#L15)
-
 Run the script
 
 `node index.js <input_file.csv> <output.geojson>`
