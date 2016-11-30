@@ -8,4 +8,4 @@ Convert your CSV to a JSON
 
 Run the script
 
-`node index.js <input_file.csv> <output.geojson>`
+`node index.js <input_file.json> <output.geojson>`
